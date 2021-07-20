@@ -3,6 +3,10 @@ package com.nipun.abxPackageDeliveryService;
 import java.io.Serializable;
 
 public class Person implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7299835737757570097L;
 	private String name;
 	private String address;
 	private String phone;
@@ -10,6 +14,10 @@ public class Person implements Serializable{
 	private String idType;
 	private String id;
 	
+	public Person() {
+		super();
+	}
+
 	public Person(String name, String id) {
 		this.name = name;
 		this.id = id;
@@ -70,5 +78,17 @@ public class Person implements Serializable{
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return "Person{" +
+				 "name='" + name + '\'' +
+				 ", address='" + address + '\''
+				 + ", phone='" + phone + '\'' 
+				 + ", email=" + email + ", "
+				 + "idType=" +idType + ","
+				 + "id=" + id + ","
+				 + '}';
 	}
 }

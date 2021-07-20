@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Scanner;
 
 public class ConsoleApplication {
-	static Registrar registrar = new Registrar();
+	static Registrar registrar = Registrar.getInstance();
 	
 	final static Scanner USER_INPUT = new Scanner(System.in);
 	
@@ -15,21 +15,21 @@ public class ConsoleApplication {
 	
 	public static void main(String[] args) {
 		Registrar.loadEmployees(employeesFile);
-		Registrar.loadPackageData(packagesFile);
-		Registrar.loadStoreData(packagesFile);
+//		Registrar.loadPackageData(packagesFile);
+//		Registrar.loadStoreData(packagesFile);
 		System.out.println(registrar.getEmployeesList());
 		System.out.println(registrar.getPackagesList());
 	
-		while (true) {
-			int input = USER_INPUT.nextInt();
-			if (input == 1){
-				registerPackage();
-			} else if (input == 2){
-				storePackage();
-			} else if (input == 3) {
-				assignPackage();
-			}
-		}
+//		while (true) {
+//			int input = USER_INPUT.nextInt();
+//			if (input == 1){
+//				registerPackage();
+//			} else if (input == 2){
+//				storePackage();
+//			} else if (input == 3) {
+//				assignPackage();
+//			}
+//		}
 	}
 	
 	public static void registerPackage() {
@@ -79,33 +79,33 @@ public class ConsoleApplication {
 		}
 	}
 
-	public static void storePackage() {
-		System.out.print("Package registration no. : ");
-		String regNo = USER_INPUT.next();
-		System.out.print("store no. : ");
-		int storeId = USER_INPUT.nextInt();
-		System.out.print("cupboard no. : ");
-		int cupboardId = USER_INPUT.nextInt();
-		System.out.println("Stored officer ID: ");
-		String storeOfficer = USER_INPUT.next();
-
-		registrar.storePackage(regNo, storeId, cupboardId, storeOfficer);
-		for (Package p : registrar.getPackagesList()) {
-			System.out.println(p);
-		}
-	}
+//	public static void storePackage() {
+//		System.out.print("Package registration no. : ");
+//		String regNo = USER_INPUT.next();
+//		System.out.print("store no. : ");
+//		int storeId = USER_INPUT.nextInt();
+//		System.out.print("cupboard no. : ");
+//		int cupboardId = USER_INPUT.nextInt();
+//		System.out.println("Stored officer ID: ");
+//		String storeOfficer = USER_INPUT.next();
+//
+//		registrar.storePackage(regNo, storeId, cupboardId, storeOfficer);
+//		for (Package p : registrar.getPackagesList()) {
+//			System.out.println(p);
+//		}
+//	}
 	
-	public static void assignPackage() {
-		System.out.print("Package Registration no. : ");
-		String regNo = USER_INPUT.next();
-		System.out.print("assigner ID: ");
-		String assignerId = USER_INPUT.next();
-		System.out.print("assignee ID: ");
-		String assigneeId = USER_INPUT.next();
-		
-		registrar.assignPackage(regNo, assignerId, assigneeId);
-		for (Package p : registrar.getPackagesList()) {
-			System.out.println(p);
-		}
-	}
+//	public static void assignPackage() {
+//		System.out.print("Package Registration no. : ");
+//		String regNo = USER_INPUT.next();
+//		System.out.print("assigner ID: ");
+//		String assignerId = USER_INPUT.next();
+//		System.out.print("assignee ID: ");
+//		String assigneeId = USER_INPUT.next();
+//		
+//		registrar.assignPackage(regNo, assignerId, assigneeId);
+//		for (Package p : registrar.getPackagesList()) {
+//			System.out.println(p);
+//		}
+//	}
 }

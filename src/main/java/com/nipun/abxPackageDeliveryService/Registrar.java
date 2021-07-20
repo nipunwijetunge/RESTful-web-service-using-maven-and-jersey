@@ -19,6 +19,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Registrar implements RegistrarManager{
+	private static Registrar instance = null;
+	
 	private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 	private static List<Employee> employees = new ArrayList<>();
 	
@@ -26,63 +28,79 @@ public class Registrar implements RegistrarManager{
 	
 	private static Package[][][] store = new Package[2][2][20];
 	
-	private static File packagesFile = new File("src"+File.separator+"main"+File.separator+"java"+File.separator+
+	private static File packagesFile = new File("D:"+File.separator+"eclipse-web-workspace"+File.separator+"abxPackageDeliveryService"+File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator+
 			"textFiles"+File.separator+"packagesFile.txt");
 	//private File storeFile = new File("src"+File.separator+"textFiles"+File.separator+"storeFile.txt");
-	private static File employeesFile = new File("src"+File.separator+"main"+File.separator+"java"+File.separator+
+	private static File employeesFile = new File("D:"+File.separator+"eclipse-web-workspace"+File.separator+"abxPackageDeliveryService"+File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator+
 			"textFiles"+File.separator+"employeesFile.txt");
 
+	public static Registrar getInstance() {
+		if (instance == null) {
+			synchronized (Registrar.class) {
+				if (instance == null) {
+					instance = new Registrar();
+				}
+			}
+		}
+		return instance;
+	}
+	
 	@Override
 	public Package registerPackage(Package pckg) {
+		//loadPackageData(packagesFile);
 		if (!packagesList.contains(pckg)){
+			//pckg = new Package();
+			
 			packagesList.add(pckg);
+			System.out.println(pckg.getBearer());
+			System.out.println(pckg);
 		}
 		
 		savePackageData(packagesFile);
-		return pckg; 
+		return pckg;
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
-	public void storePackage(String packageRegistrationNo, int storeId, int cupboardId, String storeOfficerId) {
-		packageLoop:
+	public Package storePackage(Package pkg) {
+		//packageLoop:
+		loadEmployees(employeesFile);
 		for (Package pckg : packagesList) {
-			if (pckg.getPackageRegistrationNo().equalsIgnoreCase(packageRegistrationNo)) {
-				for (Person employee : employees) {
-					if (employee.getId().equalsIgnoreCase(storeOfficerId)) {
+			if (pckg.getPackageRegistrationNo().equalsIgnoreCase(pkg.getPackageRegistrationNo())) {
+				for (Employee employee : employees) {
+					if (employee.getId().equalsIgnoreCase(pkg.getStoredOfficer().getId())) {
 						Date today = new Date();
 						pckg.setDateStored(formatter.format(today));
 						pckg.setStoredOfficer(employee);
-						pckg.setStoreId(storeId);
-						pckg.setCupboardId(cupboardId);
+						pckg.setStoreId(pkg.getStoreId());
+						pckg.setCupboardId(pkg.getCupboardId());
 						
 						for (Package.Categories category : Package.Categories.values()) {
 							if (category.toString().equals(pckg.getPackageType())) {
-								store[storeId - 1][cupboardId - 1][category.id] = pckg;
+								store[pkg.getStoreId() - 1][pkg.getCupboardId() - 1][category.id] = pckg;
 								break;
 							}
 						}					
 						pckg.setPackageFlag("Stored");
 						
 						System.out.println("Successfully stored!");
-						
-						break packageLoop;
+						savePackageData(packagesFile);
+						System.out.println(pckg);
+						return pckg;
 					}
 				}
 			}
 		}
-		
-		savePackageData(packagesFile);
+		return null;
 	}
 	
 	@Override
-	public void assignPackage(String packageRegistrationNo, String assignerId, String assigneeId) {
+	public Package assignPackage(Package item) {
 		  for (Package pckg : packagesList) {
-			  if (pckg.getPackageRegistrationNo().equalsIgnoreCase(packageRegistrationNo)) {
+			  if (pckg.getPackageRegistrationNo().equalsIgnoreCase(item.getPackageRegistrationNo())) {
 				  for (Employee employee : employees) {
-					  if (employee.getId().equalsIgnoreCase(assignerId)) {
+					  if (employee.getId().equalsIgnoreCase(item.getAssigner().getId())) {
 						  pckg.setAssigner(employee);
-					  } else if (employee.getId().equalsIgnoreCase(assigneeId)) {
+					  } else if (employee.getId().equalsIgnoreCase(item.getAssignee().getId())) {
 						  pckg.setAssignee(employee);
 					  } else {
 						  continue;
@@ -95,11 +113,14 @@ public class Registrar implements RegistrarManager{
 					  pckg.setPackageFlag("Delivering...");
 					  
 					  System.out.println("Successfully assigned!");
+					  savePackageData(packagesFile);
+					  System.out.println(pckg);
 					  
-					  break;
+					  return pckg;
 				  }
 			  }
 		  }
+		  return null;
 	}
 
 	private void savePackageData(File file){
@@ -270,7 +291,7 @@ public class Registrar implements RegistrarManager{
 	}
 
 	public List<Package> getPackagesList() {
-		//loadPackageData(packagesFile);
+		loadPackageData(packagesFile);
 		return packagesList;
 	}
 	
@@ -282,18 +303,19 @@ public class Registrar implements RegistrarManager{
 		this.packagesList = packagesList;
 	}
 	
-//	public static void addEmployee(String name, String id) {
-//		Employee employee = new Employee(name, id);
-//		employees.add(employee);
-//		saveEmployees(employeesFile);
-//	}
-//	
-//	public static void main(String[] args) {
-//		addEmployee("John", "S101");
-//		addEmployee("Sean", "S110");
-//		addEmployee("Chris", "D098");
-//		addEmployee("Tyson", "D118");
-//		addEmployee("Rick", "S009");
-//		addEmployee("Joey", "S066");
-//	}
+	public static void addEmployee(String name, String id) {
+		Employee employee = new Employee(name, id);
+		employees.add(employee);
+		saveEmployees(employeesFile);
+	}
+	
+	public static void main(String[] args) {
+		addEmployee("John", "S101");
+		addEmployee("Sean", "S110");
+		addEmployee("Chris", "D098");
+		addEmployee("Tyson", "D118");
+		addEmployee("Rick", "S009");
+		addEmployee("Joey", "S066");
+		System.out.println(packagesFile.getAbsolutePath());
+	}
 }

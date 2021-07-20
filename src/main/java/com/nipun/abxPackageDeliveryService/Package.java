@@ -11,10 +11,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-//@XmlAccessorType(XmlAccessType.FIELD)
-//@XmlRootElement(name = "Package")
 public class Package implements Serializable{
-	private static int packageId = 0;
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4510592690257068564L;
+	private int packageId;
 	private String packageIdString;
 	private String packageRegistrationNo;
 	private String dateRegistered;
@@ -28,7 +31,7 @@ public class Package implements Serializable{
 	private String deliveryType;
 	private String deliveryDate;
 	
-	private Person storedOfficer;
+	private Employee storedOfficer;
 	private int storeId;
 	private int cupboardId;
 	private String dateStored;
@@ -39,8 +42,7 @@ public class Package implements Serializable{
 	
 	private String packageFlag;
 	
-	private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-	private DecimalFormat decimalFormatter = new DecimalFormat("00000");
+	
 	
 	static enum Categories{
 		EL(0),
@@ -57,16 +59,36 @@ public class Package implements Serializable{
 	}
 	
 	public Package() {
-		super();
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		DecimalFormat decimalFormatter = new DecimalFormat("00000");
+		for (Categories category : Categories.values()) {
+			if (category.toString().equalsIgnoreCase(packageType)) {
+				this.packageType = category.toString();
+				category.id++;
+				this.packageId = category.id;
+				packageIdString = decimalFormatter.format(category.id);
+				break;
+			}
+		}
+		
+		Date today = new Date();
+		this.dateRegistered = formatter.format(today);
+		
+		this.packageFlag = "registered";
+		
+		packageRegistrationNo = this.dateRegistered.substring(6)+"/"+this.packageType+"/"+packageIdString;
 	}
 
 	public Package(String packageType, double packageWeight, Person bearer, Person reciever,
 			String deliveryType, String deliveryDate) {
 		
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		DecimalFormat decimalFormatter = new DecimalFormat("00000");
 		for (Categories category : Categories.values()) {
 			if (category.toString().equalsIgnoreCase(packageType)) {
 				this.packageType = packageType;
 				category.id++;
+				this.packageId = category.id;
 				packageIdString = decimalFormatter.format(category.id);
 				break;
 			}
@@ -88,6 +110,63 @@ public class Package implements Serializable{
 		packageRegistrationNo = this.dateRegistered.substring(6)+"/"+this.packageType+"/"+packageIdString;
 	}
 	
+	
+	public String getPackageIdString() {
+		return packageIdString;
+	}
+
+	public void setPackageIdString(String packageIdString) {
+		this.packageIdString = packageIdString;
+	}
+
+	public String getDateRegistered() {
+		return dateRegistered;
+	}
+
+	public void setDateRegistered(String dateRegistered) {
+		this.dateRegistered = dateRegistered;
+	}
+
+	public double getPackageWeight() {
+		return packageWeight;
+	}
+
+	public void setPackageWeight(double packageWeight) {
+		this.packageWeight = packageWeight;
+	}
+
+	public Person getBearer() {
+		return bearer;
+	}
+
+	public void setBearer(Person bearer) {
+		this.bearer = bearer;
+	}
+
+	public Person getReciever() {
+		return reciever;
+	}
+
+	public void setReciever(Person reciever) {
+		this.reciever = reciever;
+	}
+
+	public String getDeliveryType() {
+		return deliveryType;
+	}
+
+	public void setDeliveryType(String deliveryType) {
+		this.deliveryType = deliveryType;
+	}
+
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
+
 	public String getPackageType() {
 		return packageType;
 	}
@@ -120,12 +199,12 @@ public class Package implements Serializable{
 		this.dateStored = dateStored;
 	}
 
-	public static int getPackageId() {
+	public int getPackageId() {
 		return packageId;
 	}
 
-	public static void setPackageId(int packageId) {
-		Package.packageId = packageId;
+	public void setPackageId(int packageId) {
+		this.packageId = packageId;
 	}
 
 	public String getPackageRegistrationNo() {
@@ -140,7 +219,7 @@ public class Package implements Serializable{
 		return storedOfficer;
 	}
 
-	public void setStoredOfficer(Person storedOfficer) {
+	public void setStoredOfficer(Employee storedOfficer) {
 		this.storedOfficer = storedOfficer;
 	}
 
@@ -175,8 +254,18 @@ public class Package implements Serializable{
 	public void setCupboardId(int cupboardId) {
 		this.cupboardId = cupboardId;
 	}
+	
+	
 
-	 @Override public String toString() { return "Package{" +
+	 @Override
+	public boolean equals(Object obj) {
+		if (this == obj ) return true;
+		if ((obj == null) || getClass() != obj.getClass()) return false;
+		if (!super.equals(obj)) return false;
+		return super.equals(obj);
+	}
+
+	@Override public String toString() { return "Package{" +
 			 "packageRegistrationNo='" + packageRegistrationNo + '\'' +
 			 ", dateRegistered='" + dateRegistered + '\''
 			 + ", packageType='" + packageType + '\'' 
