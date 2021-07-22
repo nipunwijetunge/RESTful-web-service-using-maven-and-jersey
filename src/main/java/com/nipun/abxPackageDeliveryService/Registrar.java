@@ -26,11 +26,14 @@ public class Registrar implements RegistrarManager{
 	
 	private static List<Package> packagesList = new ArrayList<>();
 	
-	private static Package[][][] store = new Package[2][2][20];
+	// this 3d array is used to store packages temporally 
+	private static Package[][][] store = new Package[2][2][50];
 	
+	// packageFile is used to store package objects
 	private static File packagesFile = new File("D:"+File.separator+"eclipse-web-workspace"+File.separator+"abxPackageDeliveryService"+File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator+
 			"textFiles"+File.separator+"packagesFile.txt");
-	//private File storeFile = new File("src"+File.separator+"textFiles"+File.separator+"storeFile.txt");
+	
+	// employeeFile is used to store details of employees
 	private static File employeesFile = new File("D:"+File.separator+"eclipse-web-workspace"+File.separator+"abxPackageDeliveryService"+File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator+
 			"textFiles"+File.separator+"employeesFile.txt");
 
@@ -45,12 +48,11 @@ public class Registrar implements RegistrarManager{
 		return instance;
 	}
 	
+	// this method adds the returned package from the client side to package list
 	@Override
 	public Package registerPackage(Package pckg) {
-		//loadPackageData(packagesFile);
+		loadPackageData(packagesFile);
 		if (!packagesList.contains(pckg)){
-			//pckg = new Package();
-			
 			packagesList.add(pckg);
 			System.out.println(pckg.getBearer());
 			System.out.println(pckg);
@@ -60,31 +62,36 @@ public class Registrar implements RegistrarManager{
 		return pckg;
 	}
 
+	// this method stores a package in the store array and updates the relevant details in the package
 	@Override
 	public Package storePackage(Package pkg) {
-		//packageLoop:
 		loadEmployees(employeesFile);
 		for (Package pckg : packagesList) {
 			if (pckg.getPackageRegistrationNo().equalsIgnoreCase(pkg.getPackageRegistrationNo())) {
 				for (Employee employee : employees) {
 					if (employee.getId().equalsIgnoreCase(pkg.getStoredOfficer().getId())) {
 						Date today = new Date();
-						pckg.setDateStored(formatter.format(today));
-						pckg.setStoredOfficer(employee);
-						pckg.setStoreId(pkg.getStoreId());
-						pckg.setCupboardId(pkg.getCupboardId());
 						
-						for (Package.Categories category : Package.Categories.values()) {
-							if (category.toString().equals(pckg.getPackageType())) {
-								store[pkg.getStoreId() - 1][pkg.getCupboardId() - 1][category.id] = pckg;
-								break;
+						if ((pkg.getStoreId() == 1 || pkg.getStoreId() == 2) && (pkg.getCupboardId() == 1 || pkg.getCupboardId() == 2)) {
+							pckg.setDateStored(formatter.format(today));
+							pckg.setStoredOfficer(employee);
+							pckg.setStoreId(pkg.getStoreId());
+							pckg.setCupboardId(pkg.getCupboardId());
+							
+							for (int i = 0; i < store[pckg.getStoreId() - 1][pckg.getCupboardId() - 1].length; i++) {
+								if (store[pckg.getStoreId() - 1][pckg.getCupboardId() - 1][i] == null) {
+									store[pckg.getStoreId() - 1][pckg.getCupboardId() - 1][i] = pckg;
+									break;
+								}
 							}
-						}					
-						pckg.setPackageFlag("Stored");
-						
-						System.out.println("Successfully stored!");
-						savePackageData(packagesFile);
-						System.out.println(pckg);
+							
+							pckg.setPackageFlag("Stored");
+							System.out.println("Successfully stored!");
+							savePackageData(packagesFile);
+							System.out.println(pckg);
+							return pckg;
+						}
+
 						return pckg;
 					}
 				}
@@ -93,6 +100,7 @@ public class Registrar implements RegistrarManager{
 		return null;
 	}
 	
+	// this method updates package assignment details in the package
 	@Override
 	public Package assignPackage(Package item) {
 		  for (Package pckg : packagesList) {
@@ -158,8 +166,17 @@ public class Registrar implements RegistrarManager{
 			
 			for (;;) {
 				try {
-					Package pckg = (Package) packageOIS.readObject();
-					packagesList.add(pckg);
+					if (packageFile.length() != 0) {
+						Package pckg = (Package) packageOIS.readObject();
+						packagesList.add(pckg);
+						if (pckg.getStoreId() != 0 && pckg.getCupboardId() != 0) {
+							for (int i = 0; i < store[0][0].length; i++) {
+								store[pckg.getStoreId() - 1][pckg.getCupboardId() - 1][i] = pckg;
+							}
+						}
+					} else {
+						System.out.println("file is empty"+packageFile.length());
+					}
 				} catch (EOFException | ClassNotFoundException e) {
 					System.out.println(e);
 					break;
@@ -205,36 +222,11 @@ public class Registrar implements RegistrarManager{
 	
 	public static void loadStoreData(File packageFile) {
 		loadPackageData(packageFile);
-//		FileInputStream storeFIS = null;
-//		ObjectInputStream storeOIS = null;
-//		
-//		try {
-//			storeFIS = new FileInputStream(storeFile);
-//			storeOIS = new ObjectInputStream(storeFIS);
-//			
-//			for (;;) {
-//				try {
-//					Package pckg = (Package) storeOIS.readObject();
-//					store[pckg.getStoreId()][pckg.getCupboardId()][pckg.]
-//				} catch (EOFException | ClassNotFoundException e) {
-//					System.out.println(e);
-//					break;
-//				}
-//			}
-//			
-//			storeFIS.close();
-//			storeOIS.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
 		
 		for (Package pckg : packagesList) {
 			if (pckg.getStoreId() != 0 && pckg.getCupboardId() != 0) {
-				for (Package.Categories category : Package.Categories.values()) {
-					if (category.toString().equals(pckg.getPackageType())) {
-						store[pckg.getStoreId() - 1][pckg.getCupboardId() - 1][category.id] = pckg;
-						break;
-					}
+				for (int i = 0; i < store[0][0].length; i++) {
+					store[pckg.getStoreId() - 1][pckg.getCupboardId() - 1][i] = pckg;
 				}
 			}
 		}
@@ -303,19 +295,19 @@ public class Registrar implements RegistrarManager{
 		this.packagesList = packagesList;
 	}
 	
-	public static void addEmployee(String name, String id) {
-		Employee employee = new Employee(name, id);
-		employees.add(employee);
-		saveEmployees(employeesFile);
-	}
-	
-	public static void main(String[] args) {
-		addEmployee("John", "S101");
-		addEmployee("Sean", "S110");
-		addEmployee("Chris", "D098");
-		addEmployee("Tyson", "D118");
-		addEmployee("Rick", "S009");
-		addEmployee("Joey", "S066");
-		System.out.println(packagesFile.getAbsolutePath());
-	}
+//	public static void addEmployee(String name, String id) {
+//		Employee employee = new Employee(name, id);
+//		employees.add(employee);
+//		saveEmployees(employeesFile);
+//	}
+//	
+//	public static void main(String[] args) {
+//		addEmployee("John", "S101");
+//		addEmployee("Sean", "S110");
+//		addEmployee("Chris", "D098");
+//		addEmployee("Tyson", "D118");
+//		addEmployee("Rick", "S009");
+//		addEmployee("Joey", "S066");
+//		System.out.println(packagesFile.getAbsolutePath());
+//	}
 }

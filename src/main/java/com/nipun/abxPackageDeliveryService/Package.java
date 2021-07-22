@@ -42,8 +42,6 @@ public class Package implements Serializable{
 	
 	private String packageFlag;
 	
-	
-	
 	static enum Categories{
 		EL(0),
 		ST(0),
@@ -255,9 +253,7 @@ public class Package implements Serializable{
 		this.cupboardId = cupboardId;
 	}
 	
-	
-
-	 @Override
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj ) return true;
 		if ((obj == null) || getClass() != obj.getClass()) return false;
@@ -265,7 +261,8 @@ public class Package implements Serializable{
 		return super.equals(obj);
 	}
 
-	@Override public String toString() { return "Package{" +
+	@Override 
+	public String toString() { return "Package{" +
 			 "packageRegistrationNo='" + packageRegistrationNo + '\'' +
 			 ", dateRegistered='" + dateRegistered + '\''
 			 + ", packageType='" + packageType + '\'' 

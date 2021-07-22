@@ -23,6 +23,7 @@ import jakarta.ws.rs.core.Response;
 public class Service {
 	static Registrar registrar = Registrar.getInstance();
 	
+	//returns a list of packages in JSON format
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getpackages")
@@ -31,6 +32,7 @@ public class Service {
 		return registrar.getPackagesList();
 	}
 	
+	//returns individual packages from the packages list according to registration number and package type
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getpackage")
@@ -44,6 +46,8 @@ public class Service {
 		return null;
 	}
 	
+	//creates a new package with entered details and adds it to the packages list
+	//Gson is used to map JSON format data to a Package object
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -64,6 +68,7 @@ public class Service {
 		return registrar.registerPackage(p);
 	}
 	
+	//updates an existing package with store details and stores that package in the array
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -75,6 +80,7 @@ public class Service {
 		return registrar.storePackage(pkg);
 	}
 	
+	//assigns a particular package to a delivery officer when correct details are entered
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
