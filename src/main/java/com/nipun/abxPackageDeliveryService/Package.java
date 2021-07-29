@@ -78,7 +78,7 @@ public class Package implements Serializable{
 		Date today = new Date();
 		this.dateRegistered = formatter.format(today);
 		
-		this.packageFlag = "registered";
+		this.packageFlag = "Registered";
 		
 		packageRegistrationNo = this.dateRegistered.substring(6)+"/"+this.packageType+"/"+packageIdString;
 	}

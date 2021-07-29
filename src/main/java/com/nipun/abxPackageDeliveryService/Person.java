@@ -23,10 +23,18 @@ public class Person implements Serializable{
 	public Person() {
 		super();
 	}
-
+	
 	public Person(String name, String id) {
+		super();
 		this.name = name;
 		this.id = id;
+	}
+
+	public Person(String name, String id, String address, String phone) {
+		this.name = name;
+		this.id = id;
+		this.address = address;
+		this.phone = phone;
 	}
 	
 	public Person(String name, String address, String phone, String email, String idType, String id) {
