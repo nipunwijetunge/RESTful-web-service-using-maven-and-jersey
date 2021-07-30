@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,7 +33,7 @@ public class RegistrarDB{
 	
 	// load and establish the connection to database and execute the query
 	public ResultSet getData(String query) throws Exception{
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 	
@@ -43,26 +44,26 @@ public class RegistrarDB{
 	}
 	
 	// retrieves packages from the DB
-	public JsonArray getPackages() throws Exception {
-		String query = "select * from package";
-		ResultSet rs = getData(query);
-		
-		JsonArray jarr = new JsonArray();
-		while(rs.next()) {
-			int totalColumns = rs.getMetaData().getColumnCount();
-			JsonObject jObj = new JsonObject();
-			for (int i = 1; i <= totalColumns; i++) {
-				String columnName = rs.getMetaData().getColumnLabel(i);
-				String value = rs.getString(columnName);
-				jObj.addProperty(columnName, value);
-			}
-			jarr.add(jObj);
-		}
-		if (con != null) {
-			con.close();
-		}
-		return jarr;
-	}
+//	public JsonArray getPackages() throws Exception {
+//		String query = "select * from package";
+//		ResultSet rs = getData(query);
+//		
+//		JsonArray jarr = new JsonArray();
+//		while(rs.next()) {
+//			int totalColumns = rs.getMetaData().getColumnCount();
+//			JsonObject jObj = new JsonObject();
+//			for (int i = 1; i <= totalColumns; i++) {
+//				String columnName = rs.getMetaData().getColumnLabel(i);
+//				String value = rs.getString(columnName);
+//				jObj.addProperty(columnName, value);
+//			}
+//			jarr.add(jObj);
+//		}
+//		if (con != null) {
+//			con.close();
+//		}
+//		return jarr;
+//	}
 	
 	// retrieves customer ID types from the DB
 	public String getCustomerIdTypes() throws Exception {
@@ -83,12 +84,14 @@ public class RegistrarDB{
 		if (con != null) {
 			con.close();
 		}
-		return jarr.toString();
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Customer ID type data", jarr);
+		return new Gson().toJson(response);
 	}
 	
 	// retrieves the package types from the DB
-	public String getPackageTypes(String packageType) throws Exception {
-		String query = "select packageTypeId from packagetype where packageType='"+packageType+"'";
+	public String getPackageTypes() throws Exception {
+		String query = "select * from packagetype";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -272,7 +275,7 @@ public class RegistrarDB{
 	
 	// returns the bearer or receiver details according to the query
 	public Person setUserData(Person person, String query) throws Exception {
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
@@ -370,7 +373,7 @@ public class RegistrarDB{
 	
 	// updates sequence number of each package type when a new package is registered
 	public void updateSeqNo(String packageTypeId) throws Exception {
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
@@ -400,13 +403,12 @@ public class RegistrarDB{
 	
 	// generates the package registration number for each newly registered package
 	public String generateRegistrationNo(String packageTypeId) throws Exception {
-		updateSeqNo(packageTypeId);
+		//updateSeqNo(packageTypeId);
 		String query = "select YEAR(year) as year, seqNo, packageTypeId from m_package_sequence where packageTypeId='"+packageTypeId+"'";
 		ResultSet rs = getData(query);
 		
 		String packageRegistrationNo = "";
 		while(rs.next()) {
-			System.out.println("qq");
 			int totalColumns = rs.getMetaData().getColumnCount();
 			JsonObject jObj = new JsonObject();
 			for (int i = 1; i <= totalColumns; i++) {
@@ -425,7 +427,7 @@ public class RegistrarDB{
 	
 	// updates package status in m_package_registry table on package registry, storing and assignment
 	public void updatePackageStatus(String status, String packageRegistrationNo) throws Exception {
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
@@ -438,8 +440,8 @@ public class RegistrarDB{
 	}
 	
 	// registers package to the system
-	public void registerPackage(PackageDB pkg) throws Exception {
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+	public String registerPackage(PackageDB pkg) throws Exception {
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
@@ -453,12 +455,12 @@ public class RegistrarDB{
 		pstmt.setString(3, setWeightData(pkg.getPackageWeight()));
 		
 		// checks whether bearer is already exists in bearer table 
+		
 		boolean bearerExist = false;
 		Person bearer;
 		for (JsonElement user : getUserData("select * from bearer")) {
 			JsonObject obj = user.getAsJsonObject();
 			if (obj.get("bearerID").getAsString().equalsIgnoreCase(pkg.getBearer().getId())) {
-				System.out.println("bearer contains!");
 				bearerExist = true;
 				break;
 			}
@@ -477,7 +479,6 @@ public class RegistrarDB{
 		for (JsonElement user : getUserData("select * from reciever")) {
 			JsonObject obj = user.getAsJsonObject();
 			if (obj.get("recieverID").getAsString().equalsIgnoreCase(pkg.getReciever().getId())) {
-				System.out.println("reciever contains!");
 				recieverExist = true;
 				break;
 			}
@@ -499,11 +500,14 @@ public class RegistrarDB{
 		if (con != null) {
 			con.close();
 		}
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Package was successfully registered", packageRegistrationNo);
+		return new Gson().toJson(response);
 	}
 	
 	// stores package
-	public void storePackage(PackageDB pkg) throws Exception {
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+	public String storePackage(PackageDB pkg) throws Exception {
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
@@ -525,20 +529,24 @@ public class RegistrarDB{
 				
 				pstmt.executeUpdate();
 			} else {
-				System.out.println("Sorry! Such package has not been registered.");
+				Response response = new Response(Response.NO_DATA_FOUND, "FAILED", "No such package has been registered");
+				return new Gson().toJson(response);
 			}
 		} else {
-			System.out.println("Already stored!");
+			Response response = new Response(Response.DATA_ALREADY_EXISTS, "FAILED", "The package has already been stored");
+			return new Gson().toJson(response);
 		}
 		
 		if (con != null) {
 			con.close();
 		}
+		
+		return null;
 	}
 	
 	// assigns package to respective employees
-	public void assignPackage(PackageDB pkg) throws Exception {
-		DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+	public String assignPackage(PackageDB pkg) throws Exception {
+		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
@@ -559,14 +567,18 @@ public class RegistrarDB{
 				
 				pstmt.executeUpdate();
 			} else {
-				System.out.println("The package is not found in store.");
+				Response response = new Response(Response.NO_DATA_FOUND, "FAILED", "No such package found in store");
+				return new Gson().toJson(response);
 			}
 		} else {
-			System.out.println("Already assigned!");
+			Response response = new Response(Response.DATA_ALREADY_EXISTS, "FAILED", "The package has already been assigned");
+			return new Gson().toJson(response);
 		}
 		
 		if (con != null) {
 			con.close();
 		}
+		
+		return null;
 	}
 }

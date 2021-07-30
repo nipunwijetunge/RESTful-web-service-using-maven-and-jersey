@@ -38,7 +38,6 @@ public class DBService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getCustomerIdTypes")
 	public String getCustomerIdTypes() {
-		System.out.println("getCustomerIdTypes()");
 		try {
 			return registrar.getCustomerIdTypes();
 		} catch (Exception e) {
@@ -51,10 +50,9 @@ public class DBService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPackageTypes")
-	public String getPackageTypes(@QueryParam("packageType") String packageType) {
-		System.out.println("getPackageTypes()");
+	public String getPackageTypes() {
 		try {
-			return registrar.getPackageTypes(packageType);
+			return registrar.getPackageTypes();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,7 +64,6 @@ public class DBService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getPackageWeightCategories")
 	public String getPackageWeightCategories() {
-		System.out.println("getPackageWeightCategories()");
 		try {
 			return registrar.getPackageWeightCategories();
 		} catch (Exception e) {
@@ -80,7 +77,6 @@ public class DBService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getDeliveryTypes")
 	public String getDeliveryTypes() {
-		System.out.println("getDeliveryTypes()");
 		try {
 			return registrar.getDeliveryTypes();
 		} catch (Exception e) {
@@ -94,7 +90,6 @@ public class DBService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getEmployeeList")
 	public String getEmployeeList() {
-		System.out.println("getEmployeeList()");
 		try {
 			return registrar.loadEmployeeData();
 		} catch (Exception e) {
@@ -137,7 +132,7 @@ public class DBService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/registerPackageDB")
-	public void registerPackage(String json) throws Exception {
+	public String registerPackage(String json) throws Exception {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 //		for (JsonElement obj : registrar.getPackages()) {
 //			for (PackageDB.Categories cat : PackageDB.Categories.values()) {
@@ -149,35 +144,38 @@ public class DBService {
 //		}
 //		PackageDB p = new PackageDB(pkg.getPackageType(), pkg.getPackageWeight(), pkg.getBearer(), pkg.getReciever(), pkg.getDeliveryType(), pkg.getDeliveryDate());
 		try {
-			registrar.registerPackage(pkg);
+			return registrar.registerPackage(pkg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/storePackageDB")
-	public void storePackage(String json) {
+	public String storePackage(String json) {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
-			registrar.storePackage(pkg);
+			return registrar.storePackage(pkg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/assignPackageDB")
-	public void assignPackage(String json) {
+	public String assignPackage(String json) {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
-			registrar.assignPackage(pkg);
+			return registrar.assignPackage(pkg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 }
