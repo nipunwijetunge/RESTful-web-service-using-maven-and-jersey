@@ -12,8 +12,8 @@ public class Response {
 	private int id;
 	private String status;
 	private String description;
-	private String returnedData;
-	private JsonArray returnedDataArray;
+	private PackageRegistrationResponse packageRegistrationNo;
+	private JsonArray returnedData;
 	
 	public Response() {
 	}
@@ -25,12 +25,12 @@ public class Response {
 		this.description = description;
 	}
 	
-	public Response(int id, String status, String description, String dataReturned) {
+	public Response(int id, String status, String description, String packageRegistrationNo) {
 		super();
 		this.id = id;
 		this.status = status;
 		this.description = description;
-		this.returnedData = dataReturned;
+		this.packageRegistrationNo = new PackageRegistrationResponse(packageRegistrationNo);
 	}
 
 	public Response(int id, String status, String description, JsonArray jarr) {
@@ -38,7 +38,7 @@ public class Response {
 		this.id = id;
 		this.status = status;
 		this.description = description;
-		this.returnedDataArray = jarr;
+		this.returnedData = jarr;
 	}
 
 	public int getId() {

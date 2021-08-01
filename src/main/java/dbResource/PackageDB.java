@@ -23,8 +23,8 @@ public class PackageDB {
 	private String deliveryDate;
 	
 	private Employee storedOfficer;
-	private String storeLabel;
-	private String cupboardLabel;
+	private int storeId;
+	private int cupboardId;
 	private String dateStored;
 	
 	private Employee assigner;
@@ -167,20 +167,20 @@ public class PackageDB {
 		this.storedOfficer = storedOfficer;
 	}
 
-	public String getStoreId() {
-		return storeLabel;
+	public int getStoreId() {
+		return storeId;
 	}
 
-	public void setStoreId(String storeId) {
-		this.storeLabel = storeId;
+	public void setStoreId(int storeId) {
+		this.storeId = storeId;
 	}
 
-	public String getCupboardId() {
-		return cupboardLabel;
+	public int getCupboardId() {
+		return cupboardId;
 	}
 
-	public void setCupboardId(String cupboardId) {
-		this.cupboardLabel = cupboardId;
+	public void setCupboardId(int cupboardId) {
+		this.cupboardId = cupboardId;
 	}
 
 	public String getDateStored() {

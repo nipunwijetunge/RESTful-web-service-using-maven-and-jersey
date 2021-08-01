@@ -1,12 +1,25 @@
 package com.nipun.abxPackageDeliveryService;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Locale;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 
 import dbResource.PackageDB;
 import dbResource.RegistrarDB;
+import dbResource.Response;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -14,6 +27,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import qrUtils.QRCodeUtils;
 
 @Path("/dbService")
 public class DBService {
@@ -98,6 +112,32 @@ public class DBService {
 		return null;
 	}
 	
+	// returns store data
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/getStoreData")
+	public String getStoreData() {
+		try {
+			return registrar.getStoreData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	// returns cupboard data
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/getCupboardData")
+	public String getCupboardData() {
+		try {
+			return registrar.getCupboardData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 //	@POST
 //	@Produces(MediaType.APPLICATION_JSON)
 //	@Consumes(MediaType.APPLICATION_JSON)
@@ -128,28 +168,21 @@ public class DBService {
 //		return null;
 //	}
 	
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/registerPackageDB")
-	public String registerPackage(String json) throws Exception {
-		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
-//		for (JsonElement obj : registrar.getPackages()) {
-//			for (PackageDB.Categories cat : PackageDB.Categories.values()) {
-//				JsonObject jObj = obj.getAsJsonObject();
-//				if (jObj.get("packageType").getAsString().equals(cat.toString()) && jObj.get("packageIdCategoryWise").getAsInt() > cat.id) {
-//					cat.id = jObj.get("packageIdCategoryWise").getAsInt();
-//				}
-//			}
+	
+	
+//	@POST
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Path("/registerPackageDB")
+//	public String registerPackage(String json) throws Exception {
+//		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
+//		try {
+//			return registrar.registerPackage(pkg);
+//		} catch (Exception e) {
+//			e.printStackTrace();
 //		}
-//		PackageDB p = new PackageDB(pkg.getPackageType(), pkg.getPackageWeight(), pkg.getBearer(), pkg.getReciever(), pkg.getDeliveryType(), pkg.getDeliveryDate());
-		try {
-			return registrar.registerPackage(pkg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+//		return null;
+//	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -173,6 +206,22 @@ public class DBService {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
 			return registrar.assignPackage(pkg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path("/registerPackageDB")
+	public String registerPackage(String json) throws Exception {
+		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
+		try {
+			String content = registrar.registerPackage(pkg);
+			return QRCodeUtils.createCode(content);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

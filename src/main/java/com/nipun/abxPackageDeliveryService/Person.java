@@ -24,6 +24,11 @@ public class Person implements Serializable{
 		super();
 	}
 	
+	public Person(String id) {
+		super();
+		this.id = id;
+	}
+
 	public Person(String name, String id) {
 		super();
 		this.name = name;

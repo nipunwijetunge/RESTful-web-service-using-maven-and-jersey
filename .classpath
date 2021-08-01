@@ -32,5 +32,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="D:/Downloads/gson-2.8.7.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files (x86)/MySQL/Connector J 8.0/mysql-connector-java-8.0.26.jar"/>
+	<classpathentry kind="lib" path="D:/Downloads/javase-3.4.1.jar"/>
+	<classpathentry kind="lib" path="D:/Downloads/core-3.4.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

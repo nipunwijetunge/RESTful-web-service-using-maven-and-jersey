@@ -108,7 +108,9 @@ public class RegistrarDB{
 		if (con != null) {
 			con.close();
 		}
-		return jarr.toString();
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Pakage type data", jarr);
+		return new Gson().toJson(response);
 	}
 	
 	// retrieves package weight categories from the DB
@@ -130,7 +132,9 @@ public class RegistrarDB{
 		if (con != null) {
 			con.close();
 		}
-		return jarr.toString();
+
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Package weight data", jarr);
+		return new Gson().toJson(response);
 	}
 	
 	// retrieves delivery types from the DB
@@ -149,7 +153,51 @@ public class RegistrarDB{
 			}
 			jarr.add(jObj);
 		}
-		return jarr.toString();
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Package delivery types data", jarr);
+		return new Gson().toJson(response);
+	}
+	
+	// retrieves store data from the DB
+	public String getStoreData() throws Exception {
+		String query = "select * from store";
+		ResultSet rs = getData(query);
+		
+		JsonArray jarr = new JsonArray();
+		while(rs.next()) {
+			int totalColumns = rs.getMetaData().getColumnCount();
+			JsonObject jObj = new JsonObject();
+			for (int i = 1; i <= totalColumns; i++) {
+				String columnName = rs.getMetaData().getColumnLabel(i);
+				String value = rs.getString(columnName);
+				jObj.addProperty(columnName, value);
+			}
+			jarr.add(jObj);
+		}
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Store data", jarr);
+		return new Gson().toJson(response);
+	}
+	
+	// retrieves cupboard data from the DB
+	public String getCupboardData() throws Exception {
+		String query = "select * from cupboard";
+		ResultSet rs = getData(query);
+		
+		JsonArray jarr = new JsonArray();
+		while(rs.next()) {
+			int totalColumns = rs.getMetaData().getColumnCount();
+			JsonObject jObj = new JsonObject();
+			for (int i = 1; i <= totalColumns; i++) {
+				String columnName = rs.getMetaData().getColumnLabel(i);
+				String value = rs.getString(columnName);
+				jObj.addProperty(columnName, value);
+			}
+			jarr.add(jObj);
+		}
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Cupboard data", jarr);
+		return new Gson().toJson(response);
 	}
 	
 	// retrieves employee data from the DB
@@ -171,7 +219,9 @@ public class RegistrarDB{
 		if (con != null) {
 			con.close();
 		}
-		return jarr.toString();
+		
+		Response response = new Response(Response.SUCCESS, "SUCCESS", "Employee data", jarr);
+		return new Gson().toJson(response);
 	}
 	
 
@@ -315,8 +365,8 @@ public class RegistrarDB{
 	}
 	
 	// returns respective store room id to cupboard id in cupboard table
-	public int setStoreData(int cupboardId) throws Exception {
-		String query = "select storeroomID from cupboard where cupboardID="+cupboardId;
+	public int setStoreData(int storeId) throws Exception {
+		String query = "select storeID from store where storeID="+storeId;
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -334,8 +384,8 @@ public class RegistrarDB{
 	}
 	
 	// returns cupboard id from cupboard table if exists
-	public int setCupboardData(String cupboardLabel) throws Exception {
-		String query = "select cupboardID from cupboard where cupboardLabel='"+cupboardLabel+"'";
+	public int setCupboardData(int cupboardId) throws Exception {
+		String query = "select cupboardID from cupboard where cupboardID="+cupboardId;
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -403,7 +453,7 @@ public class RegistrarDB{
 	
 	// generates the package registration number for each newly registered package
 	public String generateRegistrationNo(String packageTypeId) throws Exception {
-		//updateSeqNo(packageTypeId);
+		updateSeqNo(packageTypeId);
 		String query = "select YEAR(year) as year, seqNo, packageTypeId from m_package_sequence where packageTypeId='"+packageTypeId+"'";
 		ResultSet rs = getData(query);
 		
@@ -501,8 +551,8 @@ public class RegistrarDB{
 			con.close();
 		}
 		
-		Response response = new Response(Response.SUCCESS, "SUCCESS", "Package was successfully registered", packageRegistrationNo);
-		return new Gson().toJson(response);
+		//Response response = new Response(Response.SUCCESS, "SUCCESS", "Package was successfully registered", packageRegistrationNo);
+		return packageRegistrationNo;
 	}
 	
 	// stores package
@@ -522,7 +572,7 @@ public class RegistrarDB{
 		if (!rs.next()) {
 			if (rs1.next()) {
 				pstmt.setString(1, setPackageRegNoData(pkg.getPackageRegistrationNo()));
-				pstmt.setInt(2, setStoreData(setCupboardData(pkg.getCupboardId())));
+				pstmt.setInt(2, setStoreData(pkg.getStoreId()));
 				pstmt.setInt(3, setCupboardData(pkg.getCupboardId()));
 				pstmt.setString(4, setEmployeeData(pkg.getStoredOfficer().getId()));
 				updatePackageStatus("Stored", setPackageRegNoData(pkg.getPackageRegistrationNo()));

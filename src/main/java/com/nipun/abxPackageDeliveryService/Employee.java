@@ -11,6 +11,10 @@ import java.io.Serializable;
 public class Employee extends Person implements Serializable{
 	private String age;
 	private String gender;
+	
+	public Employee(String id) {
+		super(id);
+	}
 
 	public Employee(String name, String id) {
 		super(name, id);
