@@ -12,7 +12,7 @@ public class Response {
 	private int id;
 	private String status;
 	private String description;
-	private PackageRegistrationResponse packageRegistrationNo;
+	private PackageRegistrationResponse packageRegistrationNoQR;
 	private JsonArray returnedData;
 	
 	public Response() {
@@ -25,12 +25,12 @@ public class Response {
 		this.description = description;
 	}
 	
-	public Response(int id, String status, String description, String packageRegistrationNo) {
+	public Response(int id, String status, String description, String packageRegistrationNoQR) {
 		super();
 		this.id = id;
 		this.status = status;
 		this.description = description;
-		this.packageRegistrationNo = new PackageRegistrationResponse(packageRegistrationNo);
+		this.packageRegistrationNoQR = new PackageRegistrationResponse(packageRegistrationNoQR);
 	}
 
 	public Response(int id, String status, String description, JsonArray jarr) {
@@ -63,6 +63,14 @@ public class Response {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public PackageRegistrationResponse getPackageRegistrationNoQR() {
+		return packageRegistrationNoQR;
+	}
+
+	public void setPackageRegistrationNoQR(PackageRegistrationResponse packageRegistrationNoQR) {
+		this.packageRegistrationNoQR = packageRegistrationNoQR;
 	}
 
 	@Override

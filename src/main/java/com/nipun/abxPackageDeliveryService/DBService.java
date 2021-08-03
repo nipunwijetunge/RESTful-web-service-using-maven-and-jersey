@@ -214,14 +214,30 @@ public class DBService {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/registerPackageDB")
-	public String registerPackage(String json) throws Exception {
+	public Response registerPackage(String json) throws Exception {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
-			String content = registrar.registerPackage(pkg);
-			return QRCodeUtils.createCode(content);
+//			boolean bearerFlag = pkg.getBearer().getId().matches("^[0-9]{9}[x|X|v|V]|[0-9]{12}$") ? true : false;
+//			boolean recieverFlag = pkg.getReciever().getId().matches("^[0-9]{9}[x|X|v|V]|[0-9]{12}$") ? true : false;
+//			
+//			if (!bearerFlag) {
+//				Response response = new Response(Response.ERROR, "FAILED", "Bearer ID is invalid");
+//				return response;
+//			} 
+//			
+//			if (!recieverFlag) {
+//				Response response = new Response(Response.ERROR, "FAILED", "Reciever ID is invalid");
+//				return response;
+//			}
+//			
+//			if (bearerFlag && recieverFlag) {
+//				String content = registrar.registerPackage(pkg);
+//				return QRCodeUtils.createCode(content);
+//			}
 			
+			return registrar.registerPackage(pkg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

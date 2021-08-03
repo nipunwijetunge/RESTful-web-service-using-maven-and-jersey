@@ -8,6 +8,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -16,8 +17,11 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
+import dbResource.Response;
+
 public class QRCodeUtils {
-	public static String createCode(String content) {
+	
+	public static Response createCode(String content) {
 		int width = 200;
 		int height = 200;
 		
@@ -33,13 +37,13 @@ public class QRCodeUtils {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			MatrixToImageWriter.writeToStream(bitMatrix, "png", bos);
 			
-			return new String(Base64.getEncoder().encode(bos.toByteArray()), "UTF-8");
+			return new Response(Response.SUCCESS, "SUCCESS", "Package Successfully registered!", new String(Base64.getEncoder().encode(bos.toByteArray()), "UTF-8"));
 			
 		} catch (Exception e) {
+			Response response = new Response(Response.ERROR, "FAILED", "Something's wrong!");
 			e.printStackTrace();
+			return response;
 		}
-
-		return null;
 	}
 	
 	private static BitMatrix deleteWhites(BitMatrix matrix) {
@@ -69,6 +73,6 @@ public class QRCodeUtils {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		decodeImage(createCode("2021/EL/00001"), "C:\\Users\\Nipun\\Desktop\\image.png");
+		decodeImage(createCode("2021/EL/00001").getPackageRegistrationNoQR().getPackageRegistrationNoQR(), "C:\\Users\\Nipun\\Desktop\\image.png");
 	}
 }

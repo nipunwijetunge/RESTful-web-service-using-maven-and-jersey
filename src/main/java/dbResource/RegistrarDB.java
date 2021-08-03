@@ -14,11 +14,13 @@ import com.nipun.abxPackageDeliveryService.Package;
 import com.nipun.abxPackageDeliveryService.Person;
 import com.nipun.abxPackageDeliveryService.Registrar;
 
-public class RegistrarDB{
+import qrUtils.QRCodeUtils;
+
+public class RegistrarDB implements RegistrarManagerDB{
 	private static RegistrarDB instance = null;
-	Connection con = null;
-	private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-	private DecimalFormat decimalFormatter = new DecimalFormat("00000");
+	private static Connection con = null;
+	private static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+	private static DecimalFormat decimalFormatter = new DecimalFormat("00000");
 	
 	public static RegistrarDB getInstance() {
 		if (instance == null) {
@@ -267,7 +269,7 @@ public class RegistrarDB{
 	}
 	
 	// returns package type id according to selected value to store in DB
-	public String setPackageTypeData(String packageType) throws Exception {
+	private String setPackageTypeData(String packageType) throws Exception {
 		String query = "select packageTypeId from packagetype where packageType='"+packageType+"'";
 		ResultSet rs = getData(query);
 
@@ -286,7 +288,7 @@ public class RegistrarDB{
 	}
 	
 	// returns weight category id to store in package table
-	public String setWeightData(String weight) throws Exception {
+	private String setWeightData(String weight) throws Exception {
 		String query = "select weightCategoryId from packageweightcategory where weightCategory='"+weight+"'";
 		ResultSet rs = getData(query);
 
@@ -305,7 +307,7 @@ public class RegistrarDB{
 	}
 	
 	// returns respective delivery type id to delivery type
-	public String setDeliveryTypeData(String deliveryType) throws Exception {
+	private String setDeliveryTypeData(String deliveryType) throws Exception {
 		String query = "select deliveryTypeId from deliverytype where deliveryType='"+deliveryType+"'";
 		ResultSet rs = getData(query);
 		
@@ -324,7 +326,7 @@ public class RegistrarDB{
 	}
 	
 	// returns the bearer or receiver details according to the query
-	public Person setUserData(Person person, String query) throws Exception {
+	private Person setUserData(Person person, String query) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
@@ -345,8 +347,27 @@ public class RegistrarDB{
 		return person;
 	}
 	
+	// returns respective customerIdTypeId to customerIdType
+	private String setCustomerIdTypedata(String customerIdType) throws Exception {
+		String query = "select idTypeID from customeridtype where idType='"+customerIdType+"'";
+		ResultSet rs = getData(query);
+		
+		while (rs.next()) {
+			int totalColumns = rs.getMetaData().getColumnCount();
+			for (int i = 1; i <= totalColumns; i++) {
+				String columnName = rs.getMetaData().getColumnLabel(i);
+				String value = rs.getString(columnName);
+				return value;
+			}
+		}
+		if (con != null) {
+			con.close();
+		}
+		return null;
+	}
+	
 	// returns package registration number to from m_package_registry table
-	public String setPackageRegNoData(String packageRegistrationNo) throws Exception {
+	private String setPackageRegNoData(String packageRegistrationNo) throws Exception {
 		String query = "select packageRegistrationNo from m_package_registry where packageRegistrationNo='"+packageRegistrationNo+"'";
 		ResultSet rs = getData(query);
 		
@@ -365,7 +386,7 @@ public class RegistrarDB{
 	}
 	
 	// returns respective store room id to cupboard id in cupboard table
-	public int setStoreData(int storeId) throws Exception {
+	private int setStoreData(int storeId) throws Exception {
 		String query = "select storeID from store where storeID="+storeId;
 		ResultSet rs = getData(query);
 		
@@ -384,7 +405,7 @@ public class RegistrarDB{
 	}
 	
 	// returns cupboard id from cupboard table if exists
-	public int setCupboardData(int cupboardId) throws Exception {
+	private int setCupboardData(int cupboardId) throws Exception {
 		String query = "select cupboardID from cupboard where cupboardID="+cupboardId;
 		ResultSet rs = getData(query);
 		
@@ -403,7 +424,7 @@ public class RegistrarDB{
 	}
 	
 	// returns employee id from employee table if exists
-	public String setEmployeeData(String employeeId) throws Exception {
+	private String setEmployeeData(String employeeId) throws Exception {
 		String query = "select employeeID from employee where employeeID='"+employeeId+"'";
 		ResultSet rs = getData(query);
 		
@@ -422,7 +443,7 @@ public class RegistrarDB{
 	}
 	
 	// updates sequence number of each package type when a new package is registered
-	public void updateSeqNo(String packageTypeId) throws Exception {
+	private void updateSeqNo(String packageTypeId) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
@@ -452,7 +473,7 @@ public class RegistrarDB{
 	}
 	
 	// generates the package registration number for each newly registered package
-	public String generateRegistrationNo(String packageTypeId) throws Exception {
+	private String generateRegistrationNo(String packageTypeId) throws Exception {
 		updateSeqNo(packageTypeId);
 		String query = "select YEAR(year) as year, seqNo, packageTypeId from m_package_sequence where packageTypeId='"+packageTypeId+"'";
 		ResultSet rs = getData(query);
@@ -476,7 +497,7 @@ public class RegistrarDB{
 	}
 	
 	// updates package status in m_package_registry table on package registry, storing and assignment
-	public void updatePackageStatus(String status, String packageRegistrationNo) throws Exception {
+	private void updatePackageStatus(String status, String packageRegistrationNo) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
@@ -489,8 +510,51 @@ public class RegistrarDB{
 		pstmt.executeUpdate();
 	}
 	
+	// validates customer id number
+	private Response validateCustomerDetails(int customerIdTypeId, String customerId) {
+		switch (customerIdTypeId) {
+			case 1:
+				if (customerId.matches("^[0-9]{9}[x|X|v|V]|[0-9]{12}$")) {
+					return new Response(Response.SUCCESS, "SUCCESS", "NIC number is valid");
+				} else {
+					return new Response(Response.ERROR, "FAILED", "NIC number is invalid");
+				}
+				
+			case 2:
+				if (customerId.matches("^[N|OL|D][0-9]{7}$")) {
+					return new Response(Response.SUCCESS, "SUCCESS", "Passport number is valid");
+				} else {
+					return new Response(Response.ERROR, "FAILED", "Passport number is invalid");
+				}
+				
+	//		case 3:
+	//			if (customerId.matches())
+			default:
+				return new Response(Response.ERROR, "FAILED", "Invalid ID type");
+		}
+	}
+	
+	// validates phone numbers
+	private Response validatePhoneNumber(String phone) {
+		if (phone.matches("^[0-9]{10}$")) {
+			return new Response(Response.SUCCESS, "SUCCESS", "Phone number is valid");
+		} else {
+			return new Response(Response.ERROR, "FAILED", "Phone number is invalid");
+		}
+	}
+	
+	// validate email
+	private Response validateEmail(String email) {
+		if (email.matches("^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$")) {
+			return new Response(Response.SUCCESS, "SUCCESS", "Email is valid");
+		} else {
+			return new Response(Response.ERROR, "FAILED", "Email is invalid");
+		}
+	}
+	
 	// registers package to the system
-	public String registerPackage(PackageDB pkg) throws Exception {
+	@Override
+	public Response registerPackage(PackageDB pkg) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
@@ -506,39 +570,80 @@ public class RegistrarDB{
 		
 		// checks whether bearer is already exists in bearer table 
 		
+		boolean bearerIdFlag = validateCustomerDetails(Integer.parseInt(pkg.getBearer().getIdType()), pkg.getBearer().getId()).getId() == 0;
+		boolean bearerPhoneFlag = validatePhoneNumber(pkg.getBearer().getPhone()).getId() == 0;
+		boolean bearerEmailFlag = validateEmail(pkg.getBearer().getEmail()).getId() == 0;
+		
 		boolean bearerExist = false;
 		Person bearer;
-		for (JsonElement user : getUserData("select * from bearer")) {
-			JsonObject obj = user.getAsJsonObject();
-			if (obj.get("bearerID").getAsString().equalsIgnoreCase(pkg.getBearer().getId())) {
-				bearerExist = true;
-				break;
+		
+		if (!bearerIdFlag) {
+			return new Response(Response.ERROR, "FAILED", "Bearer ID is invalid");
+		}
+		
+		if (!bearerPhoneFlag) {
+			return new Response(Response.ERROR, "FAILED", "Bearer phone is invalid");
+		} 
+		
+		if (!bearerEmailFlag) {
+			return new Response(Response.ERROR, "FAILED", "Bearer email is invalid");
+		}
+		
+		if (bearerIdFlag && bearerPhoneFlag && bearerEmailFlag) {
+			for (JsonElement user : getUserData("select * from bearer")) {
+				JsonObject obj = user.getAsJsonObject();
+				if (obj.get("bearerID").getAsString().equalsIgnoreCase(pkg.getBearer().getId())) {
+					bearerExist = true;
+					break;
+				}
 			}
+			if (!bearerExist) {
+				bearer = setUserData(pkg.getBearer(), "insert into bearer values(?,?,?,?,?,?)");
+			} else {
+				bearer = pkg.getBearer();
+				//return new Response(Response.DATA_ALREADY_EXISTS, "DATA EXISTS", "Bearer already exists in database");
+			}
+			pstmt.setString(4, bearer.getId());
 		}
-		if (!bearerExist) {
-			bearer = setUserData(pkg.getBearer(), "insert into bearer values(?,?,?,?,?,?)");
-		} else {
-			bearer = pkg.getBearer();
-		}
-		pstmt.setString(4, bearer.getId());
 		//
 		
 		// checks whether receiver is already exists in receiver table
+		
+		boolean receiverIdFlag = validateCustomerDetails(Integer.parseInt(pkg.getReciever().getIdType()), pkg.getReciever().getId()).getId() == 0;
+		boolean receiverPhoneFlag = validatePhoneNumber(pkg.getReciever().getPhone()).getId() == 0;
+		boolean receiverEmailFlag = validateEmail(pkg.getReciever().getEmail()).getId() == 0;
+		
 		boolean recieverExist = false;
 		Person reciever;
-		for (JsonElement user : getUserData("select * from reciever")) {
-			JsonObject obj = user.getAsJsonObject();
-			if (obj.get("recieverID").getAsString().equalsIgnoreCase(pkg.getReciever().getId())) {
-				recieverExist = true;
-				break;
+		
+		if (!receiverIdFlag) {
+			return new Response(Response.ERROR, "FAILED", "Reciever ID is invalid");
+		}
+		
+		if (!receiverPhoneFlag) {
+			return new Response(Response.ERROR, "FAILED", "Reciever phone is invalid");
+		}
+		
+		if (!receiverEmailFlag) {
+			return new Response(Response.ERROR, "FAILED", "Reciever email is invalid");
+		}
+		
+		if (receiverIdFlag && receiverPhoneFlag && receiverEmailFlag) {
+			for (JsonElement user : getUserData("select * from reciever")) {
+				JsonObject obj = user.getAsJsonObject();
+				if (obj.get("recieverID").getAsString().equalsIgnoreCase(pkg.getReciever().getId())) {
+					recieverExist = true;
+					break;
+				}
 			}
+			if (!recieverExist) {
+				reciever = setUserData(pkg.getReciever(), "insert into reciever values(?,?,?,?,?,?)");
+			} else  {
+				reciever = pkg.getReciever();
+				//return new Response(Response.DATA_ALREADY_EXISTS, "DATA EXISTS", "Reciever already exists in database");
+			}
+			pstmt.setString(5, reciever.getId());
 		}
-		if (!recieverExist) {
-			reciever = setUserData(pkg.getReciever(), "insert into reciever values(?,?,?,?,?,?)");
-		} else  {
-			reciever = pkg.getReciever();
-		}
-		pstmt.setString(5, reciever.getId());
 		//
 		
 		pstmt.setString(6, setDeliveryTypeData(pkg.getDeliveryType()));
@@ -552,10 +657,11 @@ public class RegistrarDB{
 		}
 		
 		//Response response = new Response(Response.SUCCESS, "SUCCESS", "Package was successfully registered", packageRegistrationNo);
-		return packageRegistrationNo;
+		return QRCodeUtils.createCode(packageRegistrationNo);
 	}
 	
 	// stores package
+	@Override
 	public String storePackage(PackageDB pkg) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
@@ -595,6 +701,7 @@ public class RegistrarDB{
 	}
 	
 	// assigns package to respective employees
+	@Override
 	public String assignPackage(PackageDB pkg) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
