@@ -126,12 +126,27 @@ public class DBService {
 	}
 	
 	// returns cupboard data
-	@GET
+//	@GET
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Path("/getCupboardData")
+//	public String getCupboardData() {
+//		try {
+//			return registrar.getCupboardData();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
+	
+	// sends storeId to server to filter cupboard data
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/getCupboardData")
-	public String getCupboardData() {
+	public String sendStoreId(String storeId) {
+		PackageDB pkg = new Gson().fromJson(storeId, PackageDB.class);
 		try {
-			return registrar.getCupboardData();
+			return registrar.getCupboardData(pkg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -188,7 +203,7 @@ public class DBService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/storePackageDB")
-	public String storePackage(String json) {
+	public Response storePackage(String json) {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
 			return registrar.storePackage(pkg);
@@ -202,7 +217,7 @@ public class DBService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/assignPackageDB")
-	public String assignPackage(String json) {
+	public Response assignPackage(String json) {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
 			return registrar.assignPackage(pkg);
@@ -219,24 +234,6 @@ public class DBService {
 	public Response registerPackage(String json) throws Exception {
 		PackageDB pkg = new Gson().fromJson(json, PackageDB.class);
 		try {
-//			boolean bearerFlag = pkg.getBearer().getId().matches("^[0-9]{9}[x|X|v|V]|[0-9]{12}$") ? true : false;
-//			boolean recieverFlag = pkg.getReciever().getId().matches("^[0-9]{9}[x|X|v|V]|[0-9]{12}$") ? true : false;
-//			
-//			if (!bearerFlag) {
-//				Response response = new Response(Response.ERROR, "FAILED", "Bearer ID is invalid");
-//				return response;
-//			} 
-//			
-//			if (!recieverFlag) {
-//				Response response = new Response(Response.ERROR, "FAILED", "Reciever ID is invalid");
-//				return response;
-//			}
-//			
-//			if (bearerFlag && recieverFlag) {
-//				String content = registrar.registerPackage(pkg);
-//				return QRCodeUtils.createCode(content);
-//			}
-			
 			return registrar.registerPackage(pkg);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -69,7 +69,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// retrieves customer ID types from the DB
 	public String getCustomerIdTypes() throws Exception {
-		String query = "select * from customeridtype";
+		String query = "SELECT * FROM customeridtype";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -93,7 +93,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// retrieves the package types from the DB
 	public String getPackageTypes() throws Exception {
-		String query = "select * from packagetype";
+		String query = "SELECT * FROM packagetype";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -117,7 +117,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// retrieves package weight categories from the DB
 	public String getPackageWeightCategories() throws Exception {
-		String query = "select * from packageweightcategory";
+		String query = "SELECT * FROM packageweightcategory";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr =new JsonArray();
@@ -141,7 +141,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// retrieves delivery types from the DB
 	public String getDeliveryTypes() throws Exception {
-		String query = "select * from deliverytype";
+		String query = "SELECT * FROM deliverytype";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -162,7 +162,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// retrieves store data from the DB
 	public String getStoreData() throws Exception {
-		String query = "select * from store";
+		String query = "SELECT * FROM store";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -181,9 +181,14 @@ public class RegistrarDB implements RegistrarManagerDB{
 		return new Gson().toJson(response);
 	}
 	
+	// sends selected store id to server
+//	public String setStoreIdToFilterCupboards(int storeId) {
+//		
+//	}
+	
 	// retrieves cupboard data from the DB
-	public String getCupboardData() throws Exception {
-		String query = "select * from cupboard";
+	public String getCupboardData(PackageDB pkg) throws Exception {
+		String query = "SELECT cupboardID FROM cupboard WHERE storeroomID="+pkg.getStoreId();
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -204,7 +209,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// retrieves employee data from the DB
 	public String loadEmployeeData() throws Exception {
-		String query = "select * from employee";
+		String query = "SELECT * FROM employee";
 		ResultSet rs = getData(query);
 		
 		JsonArray jarr = new JsonArray();
@@ -270,7 +275,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns package type id according to selected value to store in DB
 	private String setPackageTypeData(String packageType) throws Exception {
-		String query = "select packageTypeId from packagetype where packageType='"+packageType+"'";
+		String query = "SELECT packageTypeId FROM packagetype "
+				+ "WHERE packageType='"+packageType+"'";
 		ResultSet rs = getData(query);
 
 		while (rs.next()) {
@@ -289,7 +295,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns weight category id to store in package table
 	private String setWeightData(String weight) throws Exception {
-		String query = "select weightCategoryId from packageweightcategory where weightCategory='"+weight+"'";
+		String query = "SELECT weightCategoryId FROM packageweightcategory "
+				+ "WHERE weightCategory='"+weight+"'";
 		ResultSet rs = getData(query);
 
 		while (rs.next()) {
@@ -308,7 +315,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns respective delivery type id to delivery type
 	private String setDeliveryTypeData(String deliveryType) throws Exception {
-		String query = "select deliveryTypeId from deliverytype where deliveryType='"+deliveryType+"'";
+		String query = "SELECT deliveryTypeId FROM deliverytype "
+				+ "WHERE deliveryType='"+deliveryType+"'";
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -349,7 +357,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns respective customerIdTypeId to customerIdType
 	private String setCustomerIdTypedata(String customerIdType) throws Exception {
-		String query = "select idTypeID from customeridtype where idType='"+customerIdType+"'";
+		String query = "SELECT idTypeID FROM customeridtype "
+				+ "WHERE idType='"+customerIdType+"'";
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -368,7 +377,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns package registration number to from m_package_registry table
 	private String setPackageRegNoData(String packageRegistrationNo) throws Exception {
-		String query = "select packageRegistrationNo from m_package_registry where packageRegistrationNo='"+packageRegistrationNo+"'";
+		String query = "SELECT packageRegistrationNo FROM m_package_registry "
+				+ "WHERE packageRegistrationNo='"+packageRegistrationNo+"'";
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -387,7 +397,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns respective store room id to cupboard id in cupboard table
 	private int setStoreData(int storeId) throws Exception {
-		String query = "select storeID from store where storeID="+storeId;
+		String query = "SELECT storeID FROM store "
+				+ "WHERE storeID="+storeId;
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -406,7 +417,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns cupboard id from cupboard table if exists
 	private int setCupboardData(int cupboardId) throws Exception {
-		String query = "select cupboardID from cupboard where cupboardID="+cupboardId;
+		String query = "SELECT cupboardID FROM cupboard "
+				+ "WHERE cupboardID="+cupboardId;
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -425,7 +437,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// returns employee id from employee table if exists
 	private String setEmployeeData(String employeeId) throws Exception {
-		String query = "select employeeID from employee where employeeID='"+employeeId+"'";
+		String query = "SELECT employeeID FROM employee "
+				+ "WHERE employeeID='"+employeeId+"'";
 		ResultSet rs = getData(query);
 		
 		while (rs.next()) {
@@ -448,7 +461,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
-		String selectQuery = "select seqNo from m_package_sequence where packageTypeId='"+packageTypeId+"'";
+		String selectQuery = "SELECT seqNo FROM m_package_sequence "
+				+ "WHERE packageTypeId='"+packageTypeId+"'";
 		ResultSet rs = getData(selectQuery);
 		
 		JsonObject jObj = new JsonObject();
@@ -461,7 +475,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 			}
 		}
 		
-		String updateQuery = "update m_package_sequence set seqNo=? where packageTypeId='"+packageTypeId+"'";
+		String updateQuery = "UPDATE m_package_sequence SET seqNo=? "
+				+ "WHERE packageTypeId='"+packageTypeId+"'";
 		PreparedStatement pstmt = con.prepareStatement(updateQuery);
 		
 		pstmt.setInt(1, Integer.parseInt(jObj.get("seqNo").getAsString())+1);
@@ -475,7 +490,9 @@ public class RegistrarDB implements RegistrarManagerDB{
 	// generates the package registration number for each newly registered package
 	private String generateRegistrationNo(String packageTypeId) throws Exception {
 		updateSeqNo(packageTypeId);
-		String query = "select YEAR(year) as year, seqNo, packageTypeId from m_package_sequence where packageTypeId='"+packageTypeId+"'";
+		String query = "SELECT YEAR(year) AS year, seqNo, packageTypeId "
+				+ "FROM m_package_sequence "
+				+ "WHERE packageTypeId='"+packageTypeId+"'";
 		ResultSet rs = getData(query);
 		
 		String packageRegistrationNo = "";
@@ -502,7 +519,9 @@ public class RegistrarDB implements RegistrarManagerDB{
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
-		String query = "update m_package_registry set packageStatus=? where packageRegistrationNo='"+packageRegistrationNo+"'";
+		String query = "UPDATE m_package_registry "
+				+ "SET packageStatus=? "
+				+ "WHERE packageRegistrationNo='"+packageRegistrationNo+"'";
 		PreparedStatement pstmt = con.prepareStatement(query);
 		
 		pstmt.setString(1, status);
@@ -559,7 +578,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
-		String query = "insert into m_package_registry (packageRegistrationNo,packageTypeId,packageWeightRangeId,bearerId,recieverId,deliveryTypeId,deliveryDate,packageStatus) values(?,?,?,?,?,?,?,?)";
+		String query = "INSERT INTO m_package_registry (packageRegistrationNo,packageTypeId,packageWeightRangeId,bearerId,recieverId,deliveryTypeId,deliveryDate,packageStatus) "
+				+ "VALUES(?,?,?,?,?,?,?,?)";
 		PreparedStatement pstmt = con.prepareStatement(query);
 		
 		String packageRegistrationNo = generateRegistrationNo(setPackageTypeData(pkg.getPackageType()));
@@ -590,7 +610,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 		}
 		
 		if (bearerIdFlag && bearerPhoneFlag && bearerEmailFlag) {
-			for (JsonElement user : getUserData("select * from bearer")) {
+			for (JsonElement user : getUserData("SELECT * FROM bearer")) {
 				JsonObject obj = user.getAsJsonObject();
 				if (obj.get("bearerID").getAsString().equalsIgnoreCase(pkg.getBearer().getId())) {
 					bearerExist = true;
@@ -598,7 +618,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 				}
 			}
 			if (!bearerExist) {
-				bearer = setUserData(pkg.getBearer(), "insert into bearer values(?,?,?,?,?,?)");
+				bearer = setUserData(pkg.getBearer(), "INSERT INTO bearer "
+						+ "VALUES(?,?,?,?,?,?)");
 			} else {
 				bearer = pkg.getBearer();
 				//return new Response(Response.DATA_ALREADY_EXISTS, "DATA EXISTS", "Bearer already exists in database");
@@ -629,7 +650,7 @@ public class RegistrarDB implements RegistrarManagerDB{
 		}
 		
 		if (receiverIdFlag && receiverPhoneFlag && receiverEmailFlag) {
-			for (JsonElement user : getUserData("select * from reciever")) {
+			for (JsonElement user : getUserData("SELECT * FROM reciever")) {
 				JsonObject obj = user.getAsJsonObject();
 				if (obj.get("recieverID").getAsString().equalsIgnoreCase(pkg.getReciever().getId())) {
 					recieverExist = true;
@@ -637,7 +658,8 @@ public class RegistrarDB implements RegistrarManagerDB{
 				}
 			}
 			if (!recieverExist) {
-				reciever = setUserData(pkg.getReciever(), "insert into reciever values(?,?,?,?,?,?)");
+				reciever = setUserData(pkg.getReciever(), "INSERT INTO reciever "
+						+ "VALUES(?,?,?,?,?,?)");
 			} else  {
 				reciever = pkg.getReciever();
 				//return new Response(Response.DATA_ALREADY_EXISTS, "DATA EXISTS", "Reciever already exists in database");
@@ -662,80 +684,110 @@ public class RegistrarDB implements RegistrarManagerDB{
 	
 	// stores package
 	@Override
-	public String storePackage(PackageDB pkg) throws Exception {
+	public Response storePackage(PackageDB pkg) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
-		String query = "insert into m_package_store (packageRegistrationNo,storeID,cupboardID,storedOfficerID) values(?,?,?,?)";
+		String query = "INSERT INTO m_package_store (packageRegistrationNo,storeID,cupboardID,storedOfficerID) "
+				+ "VALUES(?,?,?,?)";
 		PreparedStatement pstmt = con.prepareStatement(query);
 		
-		String checkRegNoQuery = "select packageRegistrationNo from m_package_store where packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
-		String checkPackageInRegistry = "select packageRegistrationNo from m_package_registry where packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
+		String checkRegNoQuery = "SELECT packageRegistrationNo FROM m_package_store "
+				+ "WHERE packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
+		String checkPackageInRegistry = "SELECT packageRegistrationNo FROM m_package_registry "
+				+ "WHERE packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
+		//String checkPackageWhetherAssigned = "SELECT packageRegistrationNo FROM m_package_assignment WHERE packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
 		ResultSet rs = getData(checkRegNoQuery);
 		ResultSet rs1 = getData(checkPackageInRegistry);
+		//ResultSet rs3 = getData(checkPackageWhetherAssigned);
 		
 		if (!rs.next()) {
 			if (rs1.next()) {
 				pstmt.setString(1, setPackageRegNoData(pkg.getPackageRegistrationNo()));
 				pstmt.setInt(2, setStoreData(pkg.getStoreId()));
 				pstmt.setInt(3, setCupboardData(pkg.getCupboardId()));
-				pstmt.setString(4, setEmployeeData(pkg.getStoredOfficer().getId()));
+				
+				boolean employeeValidation = pkg.getStoredOfficer().getId().matches("^[SDRM][0-9]{3}$");
+				if (!employeeValidation) {
+					return new Response(Response.ERROR, "FAILED", "Invalid employee ID");
+				} else {
+					pstmt.setString(4, setEmployeeData(pkg.getStoredOfficer().getId()));
+				}
 				updatePackageStatus("Stored", setPackageRegNoData(pkg.getPackageRegistrationNo()));
 				
 				pstmt.executeUpdate();
+				
+				if (con != null) {
+					con.close();
+				}
+				
+				return new Response(Response.SUCCESS, "SUCCESS", "Package successfully stored");
 			} else {
-				Response response = new Response(Response.NO_DATA_FOUND, "FAILED", "No such package has been registered");
-				return new Gson().toJson(response);
+				return new Response(Response.NO_DATA_FOUND, "FAILED", "No such package has been registered");
 			}
 		} else {
-			Response response = new Response(Response.DATA_ALREADY_EXISTS, "FAILED", "The package has already been stored");
-			return new Gson().toJson(response);
+			return new Response(Response.DATA_ALREADY_EXISTS, "FAILED", "The package has already been stored");
 		}
-		
-		if (con != null) {
-			con.close();
-		}
-		
-		return null;
 	}
 	
 	// assigns package to respective employees
 	@Override
-	public String assignPackage(PackageDB pkg) throws Exception {
+	public Response assignPackage(PackageDB pkg) throws Exception {
 		DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 		String url = "jdbc:mysql://localhost:3306/abxpackagedeliveryservice";
 		con = DriverManager.getConnection(url, "root", "");
 		
-		String query = "insert into m_package_assignment (packageRegistrationNo,assignerId,assigneeId) values(?,?,?)";
-		PreparedStatement pstmt = con.prepareStatement(query);
+		String query = "INSERT INTO m_package_assignment (packageRegistrationNo,assignerId,assigneeId) "
+				+ "VALUES(?,?,?)";
+		String deleteFromStore = "DELETE FROM m_package_store "
+				+ "WHERE packageRegistrationNo=?";
 		
-		String checkRegNoQuery = "select packageRegistrationNo from m_package_assignment where packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
-		String checkRegNoQueryInStore = "select packageRegistrationNo from m_package_store where packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
+		PreparedStatement pstmt = con.prepareStatement(query);
+		PreparedStatement pstmt1 = con.prepareStatement(deleteFromStore);
+		
+		String checkRegNoQuery = "SELECT packageRegistrationNo FROM m_package_assignment "
+				+ "WHERE packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
+		String checkRegNoQueryInStore = "SELECT packageRegistrationNo FROM m_package_store "
+				+ "WHERE packageRegistrationNo='"+pkg.getPackageRegistrationNo()+"'";
 		ResultSet rs = getData(checkRegNoQuery);
 		ResultSet rs1 = getData(checkRegNoQueryInStore);
 		
 		if (!rs.next()) {
 			if (rs1.next()) {
 				pstmt.setString(1, setPackageRegNoData(pkg.getPackageRegistrationNo()));
-				pstmt.setString(2, setEmployeeData(pkg.getAssigner().getId()));
-				pstmt.setString(3, setEmployeeData(pkg.getAssignee().getId()));
+				
+				boolean employeeValidation = pkg.getAssigner().getId().matches("^[SDRM][0-9]{3}$");
+				if (!employeeValidation) {
+					return new Response(Response.ERROR, "FAILED", "Invalid assigner ID");
+				} else {
+					pstmt.setString(2, setEmployeeData(pkg.getAssigner().getId()));
+				}
+				
+				employeeValidation = pkg.getAssignee().getId().matches("^[SDRM][0-9]{3}$");
+				if (!employeeValidation) {
+					return new Response(Response.ERROR, "FAILED", "Invalid assignee ID");
+				} else {
+					pstmt.setString(3, setEmployeeData(pkg.getAssignee().getId()));
+				}
+				
 				updatePackageStatus("Assigned", setPackageRegNoData(pkg.getPackageRegistrationNo()));
 				
+				pstmt1.setString(1, setPackageRegNoData(pkg.getPackageRegistrationNo()));
+				
 				pstmt.executeUpdate();
+				pstmt1.executeUpdate();
+				
+				if (con != null) {
+					con.close();
+				}
+				
+				return new Response(Response.SUCCESS, "SUCCESS", "Package successfully assigned");
 			} else {
-				Response response = new Response(Response.NO_DATA_FOUND, "FAILED", "No such package found in store");
-				return new Gson().toJson(response);
+				return new Response(Response.NO_DATA_FOUND, "FAILED", "No such package found in store");
 			}
 		} else {
-			Response response = new Response(Response.DATA_ALREADY_EXISTS, "FAILED", "The package has already been assigned");
-			return new Gson().toJson(response);
+			return new Response(Response.DATA_ALREADY_EXISTS, "FAILED", "The package has already been assigned");
 		}
-		
-		if (con != null) {
-			con.close();
-		}
-		
-		return null;
 	}
 }
